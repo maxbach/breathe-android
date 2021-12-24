@@ -21,7 +21,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion '1.0.5'
+        kotlinCompilerExtensionVersion '1.1.0-rc02'
     }
 
     buildTypes {
@@ -41,7 +41,7 @@ android {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.14.0"
+        artifact = "com.google.protobuf:protoc:3.19.1"
     }
 
     // Generates the java Protobuf-lite code for the Protobufs in this project. See
@@ -82,6 +82,6 @@ dependencies {
     implementation "io.insert-koin:koin-android:3.1.4"
 
     // data store with proto
-    implementation  "androidx.datastore:datastore-core:1.0.0"
+    implementation  "androidx.datastore:datastore:1.0.0"
     implementation  "com.google.protobuf:protobuf-javalite:3.18.0"
 }

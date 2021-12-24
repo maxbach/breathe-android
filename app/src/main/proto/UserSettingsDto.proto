@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+option java_package = "ru.maxbach.onesec.data";
+option java_multiple_files = true;
+
+message UserSettingsDto {
+  int32 breathe_duration_in_sec = 1;
+  int32 open_breathe_delay_in_sec = 2;
+  repeated string apps_to_breathe = 3;
+}

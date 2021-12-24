@@ -1,7 +1,8 @@
-package ru.maxbach.onesec
+package ru.maxbach.onesec.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import ru.maxbach.onesec.R
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
