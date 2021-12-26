@@ -7,14 +7,16 @@ import androidx.datastore.core.Serializer
 import androidx.datastore.dataStore
 import com.google.protobuf.InvalidProtocolBufferException
 import ru.maxbach.onesec.data.UserSettingsDto
+import ru.maxbach.onesec.domain.models.UserSettings
 import java.io.InputStream
 import java.io.OutputStream
 
 object UserSettingsSerializer : Serializer<UserSettingsDto> {
+
   override val defaultValue: UserSettingsDto = UserSettingsDto.newBuilder()
-    .setBreatheDurationInSec(5)
-    .setOpenBreatheDelayInSec(0)
-    .clearAppsToBreathe()
+    .setBreatheDurationInSec(UserSettings.BREATHE_DURATION_IN_SEC_DEFAULT)
+    .setOpenBreatheDelayInSec(UserSettings.BREATHE_OPEN_DELAY_IN_SEC_DEFAULT)
+    .addAllAppsToBreathe(UserSettings.CHOSEN_APPS_DEFAULT.map { it.id })
     .build()
 
   override suspend fun readFrom(input: InputStream): UserSettingsDto {

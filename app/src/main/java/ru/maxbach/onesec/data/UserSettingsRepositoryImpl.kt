@@ -3,7 +3,7 @@ package ru.maxbach.onesec.data
 import android.content.Context
 import kotlinx.coroutines.flow.first
 import ru.maxbach.onesec.data.proto.settingsDataStore
-import ru.maxbach.onesec.domain.models.MobileApp
+import ru.maxbach.onesec.domain.models.MobileAppId
 import ru.maxbach.onesec.domain.models.UserSettings
 import ru.maxbach.onesec.domain.repo.UserSettingsRepository
 import kotlin.time.DurationUnit
@@ -16,7 +16,7 @@ class UserSettingsRepositoryImpl(
   override suspend fun set(settings: UserSettings) {
     context.settingsDataStore.updateData {
       it.newBuilderForType()
-        .addAllAppsToBreathe(settings.appsToBreathe.map { it.id.id })
+        .addAllAppsToBreathe(settings.chosenAppIds.map(MobileAppId::id))
         .setBreatheDurationInSec(settings.breatheDuration.inWholeSeconds.toInt())
         .setOpenBreatheDelayInSec(settings.openBreatheDelayDuration.inWholeSeconds.toInt())
         .build()
@@ -28,9 +28,7 @@ class UserSettingsRepositoryImpl(
       UserSettings(
         breatheDuration = dto.breatheDurationInSec.toDuration(DurationUnit.SECONDS),
         openBreatheDelayDuration = dto.openBreatheDelayInSec.toDuration(DurationUnit.SECONDS),
-        appsToBreathe = dto.appsToBreatheList.mapNotNull { appToBreatheId ->
-          MobileApp.values().find { it.id.id == appToBreatheId }
-        }
+        chosenAppIds = dto.appsToBreatheList.map(::MobileAppId)
       )
     }
   }

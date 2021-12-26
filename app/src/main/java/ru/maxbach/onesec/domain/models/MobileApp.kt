@@ -2,12 +2,13 @@ package ru.maxbach.onesec.domain.models
 
 enum class MobileApp(
   val id: MobileAppId,
+  val appName: String,
   val packages: List<String>
 ) {
-  TELEGRAM(MobileAppId("telegram"), listOf("")),
-  YOUTUBE(MobileAppId("telegram"), listOf("")),
-  INSTAGRAM(MobileAppId("telegram"), listOf("")),
-  FACEBOOK(MobileAppId("telegram"), listOf("")),
+  TELEGRAM(MobileAppId("telegram"), "Telegram", listOf("")),
+  YOUTUBE(MobileAppId("youtube"), "Youtube", listOf("")),
+  INSTAGRAM(MobileAppId("instagram"), "Instagram", listOf("")),
+  FACEBOOK(MobileAppId("facebook"), "Facebook", listOf("")),
 }
 
 @JvmInline
