@@ -5,10 +5,10 @@ enum class MobileApp(
   val appName: String,
   val packages: List<String>
 ) {
-  TELEGRAM(MobileAppId("telegram"), "Telegram", listOf("")),
-  YOUTUBE(MobileAppId("youtube"), "Youtube", listOf("")),
-  INSTAGRAM(MobileAppId("instagram"), "Instagram", listOf("")),
-  FACEBOOK(MobileAppId("facebook"), "Facebook", listOf("")),
+  TELEGRAM(MobileAppId("telegram"), "Telegram", listOf("org.telegram.messenger")),
+  YOUTUBE(MobileAppId("youtube"), "Youtube", listOf("com.google.android.youtube")),
+  INSTAGRAM(MobileAppId("instagram"), "Instagram", listOf("com.instagram.android")),
+  FACEBOOK(MobileAppId("facebook"), "Facebook", listOf("com.facebook.katana")),
 }
 
 @JvmInline

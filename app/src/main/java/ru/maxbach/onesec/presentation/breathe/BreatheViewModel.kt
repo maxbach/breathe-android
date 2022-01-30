@@ -7,9 +7,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import ru.maxbach.onesec.domain.usecase.GetUserSettingsUseCase
+import ru.maxbach.onesec.domain.usecase.settings.GetUserSettingsUseCase
 
 class BreatheViewModel(
+  private val initialParams: BreatheInitialParams,
   private val getUserSettings: GetUserSettingsUseCase,
 ) : ViewModel() {
 
@@ -24,15 +25,16 @@ class BreatheViewModel(
   init {
     viewModelScope.launch {
       delay(getUserSettings().breatheDuration)
-      // TODO: add initial params
-      _state.emit(BreatheViewState(buttons = ButtonsViewState.Visible("Telegram")))
+      _state.emit(BreatheViewState(buttons = ButtonsViewState.Visible(initialParams.forbiddenApp.appName)))
     }
   }
 
   fun handleAction(action: BreatheViewAction) {
-    when (action) {
-      BreatheViewAction.CloseApp -> _viewEvent.tryEmit(BreatheViewEvent.CloseBreathe)
-      BreatheViewAction.CloseBreathe -> _viewEvent.tryEmit(BreatheViewEvent.CloseBreatheAndLastApps)
+    viewModelScope.launch {
+      when (action) {
+        BreatheViewAction.CloseApp -> _viewEvent.emit(BreatheViewEvent.CloseBreatheAndLastApps)
+        BreatheViewAction.CloseBreathe -> _viewEvent.emit(BreatheViewEvent.CloseBreathe)
+      }
     }
   }
 

@@ -3,12 +3,13 @@ package ru.maxbach.onesec.presentation.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import ru.maxbach.onesec.domain.models.MobileAppId
 import ru.maxbach.onesec.domain.models.UserSettings
-import ru.maxbach.onesec.domain.usecase.GetUserSettingsUseCase
-import ru.maxbach.onesec.domain.usecase.SetUserSettingsUseCase
+import ru.maxbach.onesec.domain.usecase.settings.GetUserSettingsUseCase
+import ru.maxbach.onesec.domain.usecase.settings.SetUserSettingsUseCase
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -20,6 +21,10 @@ class SettingsViewModel(
   private val _state: MutableStateFlow<SettingsViewState> =
     MutableStateFlow(SettingsViewState.Uninitialized)
   val state: Flow<SettingsViewState> = _state
+
+  private val _viewEvent: MutableSharedFlow<SettingsViewEvent> =
+    MutableSharedFlow(replay = 0)
+  val viewEvent: Flow<SettingsViewEvent> = _viewEvent
 
   private val currentRegularState: SettingsViewState.Regular
     get() = _state.value as SettingsViewState.Regular
@@ -41,6 +46,9 @@ class SettingsViewModel(
           _state.emit(currentRegularState.switchChosenApp(action.changedAppId))
         }
         SettingsViewAction.SaveButtonClicked -> saveSettings()
+        SettingsViewAction.OpenSystemSettingsClicked -> {
+          _viewEvent.emit(SettingsViewEvent.OpenSystemSettings)
+        }
       }
     }
   }

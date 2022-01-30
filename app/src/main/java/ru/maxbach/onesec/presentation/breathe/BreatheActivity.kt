@@ -1,5 +1,6 @@
 package ru.maxbach.onesec.presentation.breathe
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,16 +15,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.collect
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class BreatheActivity : ComponentActivity() {
 
-  private val viewModel: BreatheViewModel by viewModel()
+  private var initialParams: BreatheInitialParams? = null
+
+  private val viewModel: BreatheViewModel by viewModel { parametersOf(initialParams) }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
+    initialParams = intent.getParcelableExtra(INITIAL_PARAMS_ARGS_KEY)
+      ?: throw IllegalStateException("Breathe activity must be opened with initial params")
+
     setContent {
       val viewState = viewModel
         .state
@@ -41,11 +50,18 @@ class BreatheActivity : ComponentActivity() {
 
   }
 
+  override fun onBackPressed() {}
+
   private fun handleViewEvent(viewEvent: BreatheViewEvent) {
     when (viewEvent) {
       BreatheViewEvent.CloseBreathe -> finish()
-      // TODO: setup correct navigation
-      BreatheViewEvent.CloseBreatheAndLastApps -> finish()
+      BreatheViewEvent.CloseBreatheAndLastApps -> {
+        startActivity(
+          Intent(Intent.ACTION_MAIN)
+            .addCategory(Intent.CATEGORY_HOME)
+            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        )
+      }
     }
   }
 
@@ -80,5 +96,13 @@ class BreatheActivity : ComponentActivity() {
         }
       }
     }
+  }
+
+  companion object {
+    fun createArgs(initialParams: BreatheInitialParams) = bundleOf(
+      INITIAL_PARAMS_ARGS_KEY to initialParams
+    )
+
+    private const val INITIAL_PARAMS_ARGS_KEY = "initial_params"
   }
 }

@@ -6,5 +6,5 @@ data class BreatheViewState(
 
 sealed class ButtonsViewState {
   object NotVisible : ButtonsViewState()
-  data class Visible(val appName: String) : ButtonsViewState()
+  data class Visible(val appName: CharSequence) : ButtonsViewState()
 }

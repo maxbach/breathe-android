@@ -7,4 +7,5 @@ sealed class SettingsViewAction {
   data class BreatheOpenDelayChanged(val newValue: Int) : SettingsViewAction()
   data class ChosenAppsChanged(val changedAppId: MobileAppId) : SettingsViewAction()
   object SaveButtonClicked : SettingsViewAction()
+  object OpenSystemSettingsClicked : SettingsViewAction()
 }

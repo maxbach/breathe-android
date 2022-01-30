@@ -1,6 +1,8 @@
 package ru.maxbach.onesec.presentation.settings
 
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
@@ -15,8 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.flow.collect
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import ru.maxbach.onesec.BuildConfig
+import ru.maxbach.onesec.domain.models.MobileApp
 import ru.maxbach.onesec.domain.models.MobileAppId
+import ru.maxbach.onesec.presentation.breathe.BreatheActivity
+import ru.maxbach.onesec.presentation.breathe.BreatheInitialParams
 
 class SettingsActivity : ComponentActivity() {
 
@@ -32,6 +40,19 @@ class SettingsActivity : ComponentActivity() {
 
       Screen(viewState = viewState)
     }
+
+    lifecycleScope.launchWhenCreated {
+      viewModel
+        .viewEvent
+        .collect { event ->
+          when (event) {
+            SettingsViewEvent.OpenSystemSettings -> {
+              startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+            }
+          }
+        }
+    }
+
   }
 
   @Composable
@@ -72,6 +93,26 @@ class SettingsActivity : ComponentActivity() {
   private fun RegularScreen(viewState: SettingsViewState.Regular) {
     Column {
       Text(text = "Settings", style = MaterialTheme.typography.h2)
+      Button(
+        modifier = Modifier.padding(16f.dp),
+        onClick = { viewModel.handleAction(SettingsViewAction.OpenSystemSettingsClicked) }
+      ) {
+        Text(text = "Open system settings")
+      }
+      if (BuildConfig.DEBUG) {
+        Button(
+          modifier = Modifier.padding(16f.dp),
+          onClick = {
+            startActivity(
+              Intent(this@SettingsActivity, BreatheActivity::class.java).also {
+                it.putExtras(BreatheActivity.createArgs(BreatheInitialParams(MobileApp.TELEGRAM)))
+              },
+            )
+          }
+        ) {
+          Text(text = "Open breathe")
+        }
+      }
       SliderWithHeader(
         header = "Breathe duration",
         currentValue = viewState.breatheDurationInSec,

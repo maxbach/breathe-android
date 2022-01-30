@@ -1,7 +1,9 @@
 package ru.maxbach.onesec.data
 
 import android.content.Context
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import ru.maxbach.onesec.data.proto.settingsDataStore
 import ru.maxbach.onesec.domain.models.MobileAppId
 import ru.maxbach.onesec.domain.models.UserSettings
@@ -23,14 +25,15 @@ class UserSettingsRepositoryImpl(
     }
   }
 
-  override suspend fun get(): UserSettings {
-    return context.settingsDataStore.data.first().let { dto ->
-      UserSettings(
-        breatheDuration = dto.breatheDurationInSec.toDuration(DurationUnit.SECONDS),
-        openBreatheDelayDuration = dto.openBreatheDelayInSec.toDuration(DurationUnit.SECONDS),
-        chosenAppIds = dto.appsToBreatheList.map(::MobileAppId)
-      )
-    }
-  }
+  override suspend fun get(): UserSettings = context.settingsDataStore.data.first().mapToDomain()
+
+  override fun observe(): Flow<UserSettings> =
+    context.settingsDataStore.data.map { it.mapToDomain() }
+
+  private fun UserSettingsDto.mapToDomain() = UserSettings(
+    breatheDuration = breatheDurationInSec.toDuration(DurationUnit.SECONDS),
+    openBreatheDelayDuration = openBreatheDelayInSec.toDuration(DurationUnit.SECONDS),
+    chosenAppIds = appsToBreatheList.map(::MobileAppId)
+  )
 
 }
