@@ -15,6 +15,7 @@ import ru.maxbach.onesec.domain.usecase.IsAppSystemUseCase
 import ru.maxbach.onesec.domain.usecase.settings.ObserveUserSettingsUseCase
 import ru.maxbach.onesec.presentation.breathe.BreatheActivity
 import ru.maxbach.onesec.presentation.breathe.BreatheInitialParams
+import kotlin.time.Duration
 
 // test
 // ----
@@ -46,21 +47,29 @@ class BoringService : AccessibilityService() {
   }
 
   override fun onAccessibilityEvent(event: AccessibilityEvent) {
-    if (event.packageName != lastEventPackage) {
-      toast(event.packageName)
-
-      if (isAppSystem(event.packageName).not()) {
+    val openedAppPackageName = event.packageName
+    if (openedAppPackageName != lastEventPackage) {
+      if (isAppSystem(openedAppPackageName).not()) {
+        toast(openedAppPackageName)
         if (lastEventPackage != BuildConfig.APPLICATION_ID) {
-          val forbiddenApp = getForbiddenApp(event.packageName, currentUserSettings)
+          val forbiddenApp = getForbiddenApp(openedAppPackageName, currentUserSettings)
 
+          lastEventPackage = openedAppPackageName
           if (forbiddenApp != null) {
-            serviceScope.launch {
-              delay(currentUserSettings.openBreatheDelayDuration)
+            if (currentUserSettings.openBreatheDelayDuration == Duration.ZERO) {
               launchBreatheActivity(forbiddenApp)
+            } else {
+              serviceScope.launch {
+                delay(currentUserSettings.openBreatheDelayDuration)
+                if (lastEventPackage == openedAppPackageName) {
+                  launchBreatheActivity(forbiddenApp)
+                }
+              }
             }
           }
+        } else {
+          lastEventPackage = event.packageName
         }
-        lastEventPackage = event.packageName
       }
     }
   }
