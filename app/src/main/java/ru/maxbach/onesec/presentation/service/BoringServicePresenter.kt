@@ -25,7 +25,7 @@ class BoringServicePresenter(
   val viewEvent: Flow<BoringServiceEvent> = _viewEvent
 
   private var currentUserSettings = UserSettings.DEFAULT
-  private var lastEventPackage: CharSequence? = null
+  private var lastAppPackage: CharSequence? = null
 
   init {
     applicationScope.launch {
@@ -44,7 +44,7 @@ class BoringServicePresenter(
     val openedAppPackageName = action.packageName
 
     applicationScope.launch {
-      if (openedAppPackageName != lastEventPackage) {
+      if (openedAppPackageName != lastAppPackage) {
         if (isAppSystem(openedAppPackageName).not()) {
           handleNonSystemEvent(openedAppPackageName)
         } else {
@@ -56,11 +56,11 @@ class BoringServicePresenter(
 
   private suspend fun handleNonSystemEvent(openedAppPackageName: CharSequence) {
     _viewEvent.emit(BoringServiceEvent.ShowToastMessageForDebug(openedAppPackageName))
-    saveLastOpenedAppPackage(openedAppPackageName)
-    if (lastEventPackage != BuildConfig.APPLICATION_ID) {
+    if (lastAppPackage != BuildConfig.APPLICATION_ID) {
       getForbiddenApp(openedAppPackageName, currentUserSettings)
         ?.let { openBreatheScreen(it) }
     }
+    saveLastOpenedAppPackage(openedAppPackageName)
   }
 
   private suspend fun openBreatheScreen(forbiddenApp: MobileApp) {
@@ -68,13 +68,13 @@ class BoringServicePresenter(
       _viewEvent.emit(BoringServiceEvent.OpenBreatheScreen(forbiddenApp))
     } else {
       delay(currentUserSettings.openBreatheDelayDuration)
-      if (lastEventPackage in forbiddenApp.packages) {
+      if (lastAppPackage in forbiddenApp.packages) {
         _viewEvent.emit(BoringServiceEvent.OpenBreatheScreen(forbiddenApp))
       }
     }
   }
 
   private fun saveLastOpenedAppPackage(appPackage: CharSequence) {
-    lastEventPackage = appPackage
+    lastAppPackage = appPackage
   }
 }
